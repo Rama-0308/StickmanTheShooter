@@ -8,12 +8,16 @@ public class GameOverUI : MonoBehaviour
     [SerializeField] private Color winColor;
     [SerializeField] private Color loseColor;
     [SerializeField] private Button rematchButton;
+    [SerializeField] private Button exitButton;
 
     private void Awake()
     {
         rematchButton.onClick.AddListener(() => {
             GameManager.Instance.RematchRpc();
         });
+
+        exitButton.onClick.AddListener(() => 
+            GameManager.Instance.LeaveMatch());
     }
 
     private void Start()

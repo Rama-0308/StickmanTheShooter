@@ -2,6 +2,7 @@ using System;
 using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using static GameManager;
 
 public class GameManager : NetworkBehaviour
@@ -63,6 +64,8 @@ public class GameManager : NetworkBehaviour
 
     }
 
+    public event EventHandler OnOpponentLeft;
+    private bool isLeavingIntentionally = false;
 
     //currently running player instance
     private Player localPlayerType;
@@ -113,12 +116,21 @@ public class GameManager : NetworkBehaviour
         }
 
         OnGameStarted?.Invoke(this, EventArgs.Empty);
-        /*
-        if (IsServer)
-        {
-            currentPlayablePlayer = Player.Player1;
-        }*/
+        NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnected;
 
+    }
+
+    private void HandleClientDisconnected(ulong clientId)
+    {
+        if (isLeavingIntentionally) return; 
+        OnOpponentLeft?.Invoke(this, EventArgs.Empty);
+    }
+
+    public void LeaveMatch()
+    {
+        isLeavingIntentionally = true;
+        NetworkManager.Singleton.Shutdown();
+        SceneManager.LoadScene("TitleScreen");
     }
 
     public void PlayerChoices(PlayerChoice choice)

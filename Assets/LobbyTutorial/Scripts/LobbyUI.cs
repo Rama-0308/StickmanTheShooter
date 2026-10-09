@@ -9,13 +9,16 @@ using UnityEngine.UI;
 public class LobbyUI : MonoBehaviour {
 
     public static LobbyUI Instance { get; private set; }
-
+    private string currentLobbyCode = "";
 
     [SerializeField] private Transform playerSingleTemplate;
     [SerializeField] private Transform container;
     [SerializeField] private TextMeshProUGUI lobbyNameText;
     [SerializeField] private TextMeshProUGUI playerCountText;
     [SerializeField] private Button leaveLobbyButton;
+    [SerializeField] private TextMeshProUGUI lobbyCodeText;
+    [SerializeField] private Button copyCodeButton;
+    [SerializeField] private GameObject lobbyCodeRowBackground;
 
 
     private void Awake()
@@ -27,6 +30,13 @@ public class LobbyUI : MonoBehaviour {
         leaveLobbyButton.onClick.AddListener(() => {
             LobbyManager.Instance.LeaveLobby();
         });
+
+        if (copyCodeButton != null)
+        {
+            copyCodeButton.onClick.AddListener(() => {
+                GUIUtility.systemCopyBuffer = currentLobbyCode;   
+            });
+        }
     }
 
     private void Start()
@@ -75,7 +85,16 @@ public class LobbyUI : MonoBehaviour {
 
         lobbyNameText.text = lobby.Name;
         playerCountText.text = lobby.Players.Count + "/" + lobby.MaxPlayers;
-
+        
+        bool isPrivate = lobby.IsPrivate;
+        lobbyCodeText.gameObject.SetActive(isPrivate);
+        copyCodeButton.gameObject.SetActive(isPrivate);
+        lobbyCodeRowBackground.SetActive(isPrivate);
+        if (isPrivate)
+        {
+            currentLobbyCode = lobby.LobbyCode;
+            lobbyCodeText.text = "Code: " + currentLobbyCode;
+        }
         Show();
     }
 

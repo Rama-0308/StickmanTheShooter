@@ -64,10 +64,19 @@ public class LobbyManager : MonoBehaviour {
     {
         playerName = playerName.Replace(" ", "_");
         this.playerName = playerName;
+
+
         InitializationOptions initializationOptions = new InitializationOptions();
         initializationOptions.SetProfile(playerName);
 
         await UnityServices.InitializeAsync(initializationOptions);
+
+        if (AuthenticationService.Instance.IsSignedIn)
+        {
+            RefreshLobbyList();
+            return;
+        }
+
 
         AuthenticationService.Instance.SignedIn += () => {
             Debug.Log("Signed in! " + AuthenticationService.Instance.PlayerId);
